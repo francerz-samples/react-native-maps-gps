@@ -1,11 +1,27 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {View, Dimensions} from 'react-native';
 import MapView, { MAP_TYPES, Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import Geolocation from '@react-native-community/geolocation';
 
 const ScreenHeight = Dimensions.get("window").height;
+Geolocation.setRNConfiguration({
+  skipPermissionRequests: false,
+  authorizationLevel: "whenInUse"
+});
 
 const App = function() {
   const [coords, setCoords] = useState({latitude: 19.2619, longitude: -103.7228});
+
+  useEffect(function() {
+    Geolocation.requestAuthorization();
+    Geolocation.getCurrentPosition((position) => {
+      console.log(position);
+      setCoords(position.coords);
+    }, (error) => {
+      console.error(error);
+    }, {timeout: 15000, maximumAge: 0, enableHighAccuracy: false});
+  }, []);
+
   return (
     <View>
       <MapView
